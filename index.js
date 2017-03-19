@@ -10,7 +10,7 @@ const client_id = ''; // Your client id
 const client_secret = ''; // Your secret
 const redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
 
-let resp = '<html><body><a href="/recent">Recent</a></body></html>';
+let resp = '<html><body><a href="/recent">Recent</a><br/><a href="/login">Login</a></body></html>';
 let access_token = '';
 let refresh_token = '';
 let userId;
@@ -190,6 +190,7 @@ app.get('/callback', (req, res) => {
 				});
 				res.send('Logged as id: ' + userId);	
         // we can also pass the token to the browser to make requests from there
+        res.redirect('/');
         // res.redirect('/#' +
         //   querystring.stringify({
         //     access_token: access_token,
