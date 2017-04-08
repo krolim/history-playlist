@@ -1,0 +1,58 @@
+<html>
+   
+   <head>
+      <title>Recently played tracks</title>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+      
+      <style>
+         table, th , td {
+            border: 1px solid grey;
+            border-collapse: collapse;
+            padding: 5px;
+         }
+         
+         table tr:nth-child(odd) {
+            background-color: #f2f2f2;
+         }
+         
+         table tr:nth-child(even) {
+            background-color: #ffffff;
+         }
+      </style>
+      
+   </head>
+   <body>
+      <h2>Recently played Tracks</h2>
+      <div ng-app = "mainApp" ng-controller = "tracksController">
+         <table>
+            <tr>
+               <th>Name</th>.
+               <th>Artist</th>
+            </tr>
+            
+            <tr ng-repeat = "track in tracks">
+               <td>{{ track.name }}</td>
+               <td> 
+                  <div ng-repeat = "artist in track.artists">
+                     {{ artist.name }} <br/>
+                  </div>
+               </td>
+            </tr>
+         </table>
+         
+      </div>
+      
+      <script>
+         var mainApp = angular.module("mainApp", []);
+         
+         mainApp.controller('tracksController', function($scope,$http) {
+            var url = '/recent';
+
+            $http.get(url).then( function(response) {
+               $scope.tracks = response.data;
+            });
+         });
+      </script>
+      
+   </body>
+</html>
