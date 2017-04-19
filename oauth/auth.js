@@ -11,6 +11,9 @@ const clientId = process.env.CLIENT_ID || ''; // Your client id
 const clientSecret = process.env.CLIENT_SECRET || ''; // Your secret
 const redirectUri = process.env.REDIRECT_URL || 'http://localhost:8888/callback/'; // Your redirect uri
 
+const authHeaders = { 'Authorization': 'Basic ' + 
+    		(new Buffer(clientId + ':' + clientSecret).toString('base64')) };
+
 const scope = 'user-read-private user-read-email user-read-recently-played ' +
    						'playlist-modify-private playlist-read-private';
 /**
@@ -117,12 +120,35 @@ const callback = (req, res, cb) => {
   }
 }
 
+const refreshToken(context, cb) => {
+	const authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: authHeaders,
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: context.refreshToken
+    },
+    json: true
+  };
+
+  request.post(authOptions, (error, response, body) => {    
+    if (!error && response.statusCode === 200) {
+    	console.log(body);
+      context.accessToken = body.access_token;
+      cb(null, response.statusCode);
+    } else {
+    	cb(error, response.statusCode);
+    }
+  });
+}
+
 const refresh = (req, res) => {
 	console.log('refresh');
 	 // requesting access token from refresh token
 	const storedToken = req.cookies ? req.cookies['spotifyRefreshToken'] : null;
 	if (!storedToken) {
-		return res.redirect('/login');
+		console.log('Not logged in');
+		return;
 	}
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
@@ -134,18 +160,22 @@ const refresh = (req, res) => {
     json: true
   };
 
-  request.post(authOptions, function(error, response, body) {
+  request.post(authOptions, (error, response, body) => {
     if (!error && response.statusCode === 200) {
     	console.log(body);
       const accessToken = body.access_token;
       res.cookie('spotifyHistoryToken', accessToken);
       console.log('token', accessToken);
-      // res.send({
-      //   'access_token': accessToken
-      // });
+      res.send({
+        'access_token': accessToken
+      });
     }
   });
 };
+
+const getAuthHeader = (context) => {
+	return { 'Authorization': 'Bearer ' + context.accessToken };
+}
 
 const authHeader = (req) => { 
 	const accessToken = req.cookies ? req.cookies['spotifyHistoryToken'] : '';
