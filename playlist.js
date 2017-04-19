@@ -62,6 +62,16 @@ const getRecentlyPlayed = (req, res) => {
   // use the access token to access the Spotify Web API
 	request.get(options, (error, response, body) => {
 		if (!error) {
+			console.log('sfy resp code', response.statusCode);
+			if (response.statusCode == 401) {
+				const storedToken = req.cookies ? req.cookies['spotifyRefreshToken'] : null;
+				if (req.cookies && req.cookies['spotifyRefreshToken']) {
+					oauth.refresh(req, res);
+				} else {
+					res.statusCode(401).send();
+				}
+				return;
+			}
 			const items = body.items;
 			const trackIds = {};
 			const trackUris = [];

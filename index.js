@@ -36,7 +36,7 @@ app.post('/modify', playlists.modifyPlaylist);
 // auth
 app.get('/login', oauth.login);
 app.get('/callback', oauth.callback);
-app.get('/refresh_token', oauth.refresh);
+// app.get('/refresh_token', oauth.refresh);
 
 console.log('Listening on 8888');
 app.listen(8888);

@@ -3,46 +3,109 @@
    <head>
       <title>Recently played tracks</title>
       <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular-route.min.js"></script>
+
       
    		<!-- Latest compiled and minified CSS -->
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
       
    </head>
    <body>
-   		<div ng-app = "mainApp" ng-controller = "tracksController">
-	   		<div class="panel panel-default">
-				  <!-- Default panel contents -->
-				  <div class="panel-heading"><h2>Recently played tracks</h2></div>
+   		<div ng-app = "mainApp">
+   		<ul class="nav nav-pills"  ng-controller="HeaderController">
+			  <li role="presentation" ng-class="{ active: isActive('/showTracks')}"><a href="#showTracks">Home</a></li>
+			  <li role="presentation" ng-class="{ active: isActive('/setPlaylist')}"><a href="#setPlaylist">Settings</a></li>
+			</ul>
+      <div ng-view></div>
+       <script type="text/ng-template" id="setPlaylist.htm">
+       		<div class="panel panel-default">
+					  <div class="panel-heading">
+					    <h3 class="panel-title">Set playlist</h3>
+					  </div>
+					  <div class="panel-body">
+					    <form class="form-inline">
+							  <div class="form-group">
+							    <label for="playlistName">Name</label>
+							    <input type="text" class="form-control" id="playlistName" ng-model="playlistName">
+							  </div>
+							  <button type="submit" class="btn btn-default" ng-click="create()">Create</button>
+							</form>
+							<form class="form-inline">
+								<div class="form-group">
+								    <label for="playlistUrl">URL</label>
+								    <input type="url" class="form-control" id="playlistUrl" ng-model="playlistUrl">
+								  </div>
+								  <button type="submit" class="btn btn-default" ng-click="update()">Set</button>
+						  	</div>
+						  </form>
+					  <p><br/>{{ message }}</p>
+       </script>
 
-				  <!-- Table -->
-				  <table class="table table-striped">
-            <tr>
-               <th>Name</th>.
-               <th>Artist</th>
-            </tr>
-            
-            <tr ng-repeat = "track in tracks">
-               <td>{{ track.name }}</td>
-               <td> 
-                  <div ng-repeat = "artist in track.artists">
-                     {{ artist.name }} <br/>
-                  </div>
-               </td>
-            </tr>
-         	</table>
-				</div>
-			</div>
+       <script type="text/ng-template" id="showTracks.htm">
+          <div class="panel-heading"><h2>Recently played tracks</h2></div>
+          <table class="table table-striped">
+          <tr>
+             <th>Name</th>.
+             <th>Artist</th>
+          </tr>
+          
+          <tr ng-repeat="track in tracks">
+             <td>{{ track.name }}</td>
+             <td> 
+                <div ng-repeat = "artist in track.artists">
+                   {{ artist.name }} <br/>
+                </div>
+             </td>
+          </tr>
+       	</table>
+       </script>
       
-      <script>
-         var mainApp = angular.module("mainApp", []);
-         
-         mainApp.controller('tracksController', function($scope,$http) {
+
+       <script>
+         var mainApp = angular.module("mainApp", ['ngRoute']);
+         mainApp.config(['$routeProvider', function($routeProvider) {
+            $routeProvider.
+            
+            when('/showTracks', {
+               templateUrl: 'showTracks.htm',
+               controller: 'TracksController'
+            }).
+            
+            when('/setPlaylist', {
+               templateUrl: 'setPlaylist.htm',
+               controller: 'SetPlaylistController'
+            }).
+            
+            otherwise({
+               redirectTo: '/showTracks'
+            });
+         }]);
+
+         mainApp.controller('HeaderController', function($scope, $location) {
+         		$scope.isActive = function (viewLocation) { 
+				        return viewLocation === $location.path();
+				    };	
+         });
+
+         mainApp.controller('TracksController', function($scope,$http) {
             var url = '/recent';
 
             $http.get(url).then( function(response) {
                $scope.tracks = response.data;
             });
          });
+         
+         mainApp.controller('SetPlaylistController', function($scope) {
+         		$scope.playlistName = "Recently Played Tracks";
+            // $scope.message = "";
+            $scope.create = function() {
+            	$scope.message = "Playlist " + $scope.playlistName + " created";
+            }
+            $scope.update = function() {
+            	$scope.message = "Playlist URL: " + $scope.playlistUrl;
+            }
+         });
+			
       </script>
       
    </body>

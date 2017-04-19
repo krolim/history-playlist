@@ -117,7 +117,8 @@ const callback = (req, res, cb) => {
   }
 }
 
-const refresh = (req, resp) => {
+const refresh = (req, res) => {
+	console.log('refresh');
 	 // requesting access token from refresh token
 	const storedToken = req.cookies ? req.cookies['spotifyRefreshToken'] : null;
 	if (!storedToken) {
@@ -125,7 +126,7 @@ const refresh = (req, resp) => {
 	}
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    headers: { 'Authorization': 'Basic ' + (new Buffer(clientId + ':' + clientSecret).toString('base64')) },
     form: {
       grant_type: 'refresh_token',
       refresh_token: storedToken
@@ -135,11 +136,13 @@ const refresh = (req, resp) => {
 
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
-      const accessToken = body.accessToken;
+    	console.log(body);
+      const accessToken = body.access_token;
       res.cookie('spotifyHistoryToken', accessToken);
-      res.send({
-        'access_token': accessToken
-      });
+      console.log('token', accessToken);
+      // res.send({
+      //   'access_token': accessToken
+      // });
     }
   });
 };
