@@ -4,12 +4,14 @@ const request = require('request'); // "Request" library
 const querystring = require('querystring');
 const oauth = require('./oauth/auth.js');
 
+const RETRIES = 1;
+
 const getRecentlyPlayedTracks = (context, limit, before, cb) => {
-	spotRequest(context, 'https://api.spotify.com/v1/me/player/recently-played', 
+	spotRequest(context, 'https://api.spotify.com/v1/me/player/recently-played',
 		'GET', { limit: limit, before: before }, (err, responseCode, body) => {
 			if (err) {
 				return cb(err);
-			} 
+			}
 			if (responseCode !== 200) {
 				return cb('error ' + responseCode);
 			}
@@ -18,7 +20,7 @@ const getRecentlyPlayedTracks = (context, limit, before, cb) => {
 	);
 }
 
-const spotRequest = (context, url, method, body, cb) => {
+const spotRequest = (context, url, method, body, cb, retry = 0) => {
 	const options = {
 		method: method,
     url: url,
@@ -33,14 +35,19 @@ const spotRequest = (context, url, method, body, cb) => {
 			cb(err);
 	  } else {
 	  	if (response.statusCode === 401) {
-	  		oauth.refreshToken(context, (err, statusCode) => {
-	  			if (!err && response.statusCode === 200) {
-	  				return spotRequest = (context, url, method, body, cb);
-	  			}
-	  		});
+				if (retry < RETRIES) {
+					oauth.refreshToken(context, (err, statusCode) => {
+						if (!err && response.statusCode === 200) {
+							retry = retry + 1;
+							return spotRequest(context, url, method, body, cb, retry);
+						}
+					});
+				} else {
+					retrun cb('Not authenticated', response.statusCode, body);
+				}
 	  	}
 	  	cb(null, response.statusCode, body);
 	  }
-			
-	}	
+
+	}
 }
