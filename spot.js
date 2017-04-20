@@ -7,8 +7,12 @@ const oauth = require('./oauth/auth.js');
 const RETRIES = 1;
 
 const getRecentlyPlayedTracks = (context, limit, before, cb) => {
+	const options = { limit: limit };
+	if (before) {
+		options.before = before;
+	}
 	spotRequest(context, 'https://api.spotify.com/v1/me/player/recently-played',
-		'GET', { limit: limit, before: before }, (err, responseCode, body) => {
+		'GET', options, (err, responseCode, body) => {
 			if (err) {
 				return cb(err);
 			}

@@ -46,6 +46,13 @@ const recentlyPlayed = (req, res) => {
 	}
 }
 
+const getHistory = (context, amount) => {
+	let time;
+	spotify.getRecentlyPlayedTracks(context, 50, time, (err, itmes) => {
+		
+	});
+}
+
 const getRecentlyPlayed = (req, res) => {
 	const oauthHeader = oauth.authHeader(req); 
 	const userId = oauth.userId(req);
