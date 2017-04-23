@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const oauth = require('./oauth/auth.js');
 const playlists = require('./playlist.js');
+const routes = require('./route.js');
 
 // let resp = '<html><body><a href="/recent">Recent</a><br/><a href="/login">Login</a></body></html>';
 
@@ -29,7 +30,8 @@ app.get('/', (req, res) => {
 
 // app
 app.put('/create', playlists.createPlaylist);
-app.get('/recent', playlists.getRecentlyPlayed);
+// app.get('/recent-old', playlists.getRecentlyPlayed);
+app.get('/recent', routes.getRecentPlaylist);
 app.get('/refresh', playlists.recentlyPlayed);
 app.post('/modify', playlists.modifyPlaylist);
 

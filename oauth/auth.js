@@ -7,6 +7,10 @@ const querystring = require('querystring');
 // let refreshToken = '';
 const stateKey = 'spotify_auth_state';
 
+const HISTORY_TOKEN = 'spotifyHistoryToken';
+const REFRESH_TOKEN = 'spotifyRefreshToken';
+const USER_ID = 'spotifyHistoryUserId';
+
 const clientId = process.env.CLIENT_ID || ''; // Your client id
 const clientSecret = process.env.CLIENT_SECRET || ''; // Your secret
 const redirectUri = process.env.REDIRECT_URL || 'http://localhost:8888/callback/'; // Your redirect uri
@@ -30,6 +34,31 @@ const generateRandomString = (length) => {
   }
   return text;
 };
+
+const setCookies = (res, refreshToken, accessToken, userId) => {
+	if (refreshToken)
+  	res.cookie('spotifyRefreshToken', refreshToken);
+  if (accessToken)
+		res.cookie('spotifyHistoryToken', accessToken);
+  if (userId)
+  	res.cookie('spotifyHistoryUserId', userId);
+}
+
+const getContext = (req) => {
+	const context = {};
+	if (req.cookies) {
+		const accessToken = req.cookies[HISTORY_TOKEN];	
+		const refreshToken = req.cookies[REFRESH_TOKEN];
+		const userId = req.cookies[USER_ID];
+		if (accessToken)
+			context.accessToken = accessToken;
+		if (refreshToken)
+			context.refreshToken = refreshToken;
+		if (userId)
+			context.userId = userId;
+	}	
+	return context;
+}
 
 
 const login = (req, res) => {
@@ -84,7 +113,7 @@ const callback = (req, res, cb) => {
         const accessToken = body.access_token;
         const refreshToken = body.refresh_token;
         let userId;
-
+ 
         // GET https://api.spotify.com/v1/me
         const options = {
 			    url: 'https://api.spotify.com/v1/me',
@@ -96,14 +125,12 @@ const callback = (req, res, cb) => {
 						userId = body.id;
 						console.log('User ID:', userId);
 					} else {
-						return res.statusCode(401).send();
+						return res.status(401).send();
 					}
 				});
 				// res.send('Logged as id: ' + userId);	
         // we can also pass the token to the browser to make requests from there
-        res.cookie('spotifyHistoryToken', accessToken);
-        res.cookie('spotifyRefreshToken', refreshToken);
-        res.cookie('spotifyHistoryUserId', userId);
+        setCookies(refreshToken, accessToken, userId);
         res.redirect('/');
         // res.redirect('/#' +
         //   querystring.stringify({
@@ -120,7 +147,7 @@ const callback = (req, res, cb) => {
   }
 }
 
-const refreshToken(context, cb) => {
+const refreshToken = (context, cb) => {
 	const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: authHeaders,
@@ -191,3 +218,6 @@ module.exports.callback = callback;
 module.exports.refresh = refresh;
 module.exports.authHeader = authHeader;
 module.exports.userId = userId;
+module.exports.getContext = getContext;
+module.exports.refreshToken = refreshToken;
+module.exports.getAuthHeader = getAuthHeader;

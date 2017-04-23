@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.3.0",
+    "asynch": "^0.5.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.15.2",
     "querystring": "^0.2.0",

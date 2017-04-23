@@ -25,6 +25,7 @@ const getRecentlyPlayedTracks = (context, limit, before, cb) => {
 }
 
 const spotRequest = (context, url, method, body, cb, retry = 0) => {
+	const callback = cb;
 	const options = {
 		method: method,
     url: url,
@@ -47,11 +48,12 @@ const spotRequest = (context, url, method, body, cb, retry = 0) => {
 						}
 					});
 				} else {
-					retrun cb('Not authenticated', response.statusCode, body);
+					return cb('Not authenticated', response.statusCode, body);
 				}
 	  	}
 	  	cb(null, response.statusCode, body);
 	  }
-
-	}
+	});
 }
+
+module.exports.getRecentlyPlayedTracks = getRecentlyPlayedTracks;
