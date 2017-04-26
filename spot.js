@@ -25,7 +25,6 @@ const getRecentlyPlayedTracks = (context, limit, before, cb) => {
 }
 
 const spotRequest = (context, url, method, body, cb, retry = 0) => {
-	const callback = cb;
 	const options = {
 		method: method,
     url: url,
@@ -33,26 +32,28 @@ const spotRequest = (context, url, method, body, cb, retry = 0) => {
     body: body,
     json: true
   };
-
   // use the access token to access the Spotify Web API
 	request(options, (error, response, body) => {
-		if (error) {
-			cb(err);
-	  } else {
-	  	if (response.statusCode === 401) {
-				if (retry < RETRIES) {
-					oauth.refreshToken(context, (err, statusCode) => {
-						if (!err && response.statusCode === 200) {
-							retry = retry + 1;
-							return spotRequest(context, url, method, body, cb, retry);
-						}
-					});
-				} else {
-					return cb('Not authenticated', response.statusCode, body);
-				}
-	  	}
-	  	cb(null, response.statusCode, body);
-	  }
+		if (error)
+			rerurn cb(err);
+  	if (response.statusCode === 401) {
+				// refresh the token and repeat the request
+				oauth.refreshToken(context, (err, statusCode) => {
+					if (!err && response.statusCode === 200) {
+						options.headers = oauth.getAuthHeader(context);
+						request(options, (error, response, body) => {
+							if (error)
+								return cb(error);
+							if (response.statusCode !== 200)
+								return cb('Not authenticated', response.statusCode, body);
+							return cb(null, response.statusCode, body);
+						});
+					} else
+				});
+			} else {
+			}
+  	}
+  	return cb(null, response.statusCode, body);
 	});
 }
 
