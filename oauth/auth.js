@@ -35,13 +35,13 @@ const generateRandomString = (length) => {
   return text;
 };
 
-const setCookies = (res, refreshToken, accessToken, userId) => {
-	if (refreshToken)
-  	res.cookie('spotifyRefreshToken', refreshToken);
-  if (accessToken)
-		res.cookie('spotifyHistoryToken', accessToken);
-  if (userId)
-  	res.cookie('spotifyHistoryUserId', userId);
+const storeContext = (res, context) => {
+	if (context.refreshToken)
+  	res.cookie('spotifyRefreshToken', context.refreshToken);
+  if (context.accessToken)
+		res.cookie('spotifyHistoryToken', context.accessToken);
+  if (context.userId)
+  	res.cookie('spotifyHistoryUserId', context.userId);
 }
 
 const getContext = (req) => {
@@ -78,7 +78,7 @@ const login = (req, res) => {
     }));
 }
 
-const callback = (req, res, cb) => {
+const callback = (req, res) => {
 
   // your application requests refresh and access tokens
   // after checking the state parameter
@@ -121,17 +121,21 @@ const callback = (req, res, cb) => {
 			    json: true
 			  };
 				request.get(options, (error, response, body) => {
-					if (!error) {
-						userId = body.id;
-						console.log('User ID:', userId);
-					} else {
-						return res.status(401).send();
-					}
+          if (error) {
+            return res.status(401).send('Unable to get user id');
+          }
+					userId = body.id;
+					console.log('User ID:', userId);
+					const context = { 
+            refreshToken: refreshToken, 
+            accessToken: accessToken,
+            userId: userId
+          }
+          storeContext(res, context);
+          res.redirect('/');
 				});
 				// res.send('Logged as id: ' + userId);	
         // we can also pass the token to the browser to make requests from there
-        setCookies(refreshToken, accessToken, userId);
-        res.redirect('/');
         // res.redirect('/#' +
         //   querystring.stringify({
         //     access_token: access_token,
@@ -160,8 +164,9 @@ const refreshToken = (context, cb) => {
 
   request.post(authOptions, (error, response, body) => {    
     if (!error && response.statusCode === 200) {
-    	console.log(body);
+    	console.log('status %s, body %j', response.statusCode, body);
       context.accessToken = body.access_token;
+      context.modified = true;
       cb(null, response.statusCode);
     } else {
     	cb(error, response.statusCode);

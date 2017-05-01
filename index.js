@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const querystring = require('querystring');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 const oauth = require('./oauth/auth.js');
 const playlists = require('./playlist.js');
@@ -13,6 +14,7 @@ const routes = require('./route.js');
 
 
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use('/public', express.static('public'));
 
 
@@ -32,8 +34,9 @@ app.get('/', (req, res) => {
 app.put('/create', playlists.createPlaylist);
 // app.get('/recent-old', playlists.getRecentlyPlayed);
 app.get('/recent', routes.getRecentPlaylist);
-app.get('/refresh', playlists.recentlyPlayed);
-app.post('/modify', playlists.modifyPlaylist);
+app.post('/set-playlist', routes.setPlaylist);
+// app.get('/refresh', playlists.recentlyPlayed);
+// app.post('/modify', playlists.modifyPlaylist);
 
 // auth
 app.get('/login', oauth.login);

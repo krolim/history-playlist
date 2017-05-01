@@ -13,5 +13,9 @@ const saveSettings = (userId, userSettings) => {
 
 module.exports.save = saveSettings;
 module.exports.get = (userId) => {
+	console.log('---->', usersSettings[userId]);
+	if (!usersSettings[userId]) {
+		return {};
+	}
 	return usersSettings[userId];
 }

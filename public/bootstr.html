@@ -42,71 +42,35 @@
        </script>
 
        <script type="text/ng-template" id="showTracks.htm">
+        <div class="panel panel-default">
           <div class="panel-heading"><h2>Recently played tracks</h2></div>
+          <div class="panel-body">
+            <input class="btn btn-default" type="button" value="Merge" />
+            <input class="btn btn-default" type="button" value="Overwrite" />
+            <input class="btn btn-default" type="button" value="Create As New" />  
+          </div>
+        </div>  
           <table class="table table-striped">
           <tr>
              <th>Name</th>.
              <th>Artist</th>
+             <th>Last Played</th>
           </tr>
           
-          <tr ng-repeat="track in tracks">
-             <td>{{ track.name }}</td>
+          <tr ng-repeat="item in tracks">
+             <td>{{ item.track.name }}</td>
              <td> 
-                <div ng-repeat = "artist in track.artists">
+                <div ng-repeat = "artist in item.track.artists">
                    {{ artist.name }} <br/>
                 </div>
              </td>
+             <td>{{ item.last_played_at | date:'medium' }}
           </tr>
        	</table>
        </script>
       
 
-       <script>
-         var mainApp = angular.module("mainApp", ['ngRoute']);
-         mainApp.config(['$routeProvider', function($routeProvider) {
-            $routeProvider.
-            
-            when('/showTracks', {
-               templateUrl: 'showTracks.htm',
-               controller: 'TracksController'
-            }).
-            
-            when('/setPlaylist', {
-               templateUrl: 'setPlaylist.htm',
-               controller: 'SetPlaylistController'
-            }).
-            
-            otherwise({
-               redirectTo: '/showTracks'
-            });
-         }]);
-
-         mainApp.controller('HeaderController', function($scope, $location) {
-         		$scope.isActive = function (viewLocation) { 
-				        return viewLocation === $location.path();
-				    };	
-         });
-
-         mainApp.controller('TracksController', function($scope,$http) {
-            var url = '/recent';
-
-            $http.get(url).then( function(response) {
-               $scope.tracks = response.data;
-            });
-         });
-         
-         mainApp.controller('SetPlaylistController', function($scope) {
-         		$scope.playlistName = "Recently Played Tracks";
-            // $scope.message = "";
-            $scope.create = function() {
-            	$scope.message = "Playlist " + $scope.playlistName + " created";
-            }
-            $scope.update = function() {
-            	$scope.message = "Playlist URL: " + $scope.playlistUrl;
-            }
-         });
-			
-      </script>
+       <script src="js/angular.js"></script>
       
    </body>
 </html>
