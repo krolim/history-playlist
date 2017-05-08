@@ -16,9 +16,10 @@ const getRecentlyPlayedTracks = (context, cb) => {
 			if (err) 
 				return cb(err);
 			if (responseCode !== 200) {
-				return cb('error ' + responseCode);
+				return cb('Request received error code: ' + responseCode + ' -> ' + body);
 			}
-			console.log('Cursors ', body.cursors);
+			if (!body.items)
+				return cb('Not a valid response body: ' + body);
 			cb(null, body.items);
 		}
 	);
@@ -57,7 +58,7 @@ const createPlaylist = (context, name, cb) => {
 			if (err)
 				return cb(err);
 			if (responseCode !== 201) {
-				return cb('error ' + responseCode);
+				return cb('Request received error code: %d -> %s', responseCode, body);
 			}
 			return cb(null, body.id, body.name);
 		}
@@ -89,16 +90,19 @@ const spotRequest = (context, url, method, body, cb) => {
 		method: method,
     url: url,
     headers: oauth.getAuthHeader(context),
-    body: body,
     json: true
   };
+  if (body) 
+  	options.body = body;
   console.log('Call with options', options);
   // use the access token to access the Spotify Web API
 	request(options, (error, response, body) => {
+		console.log('Error: %j; Response code: %d; body: %j', error, response.statusCode, body);
 		if (error)
 			return cb(err);
   	if (response.statusCode === 401) {
 			// refresh the token and repeat the request
+			console.log('Refreshing token for user: ', context.userId);
 			oauth.refreshToken(context, (err, statusCode) => {
 				if (!err && statusCode === 200) {
 					console.log('Successfully fetched new token %j', context);
@@ -111,8 +115,8 @@ const spotRequest = (context, url, method, body, cb) => {
 						return cb(null, response.statusCode, body);
 					});
 				} else {
-					console.log('Error ', err, 'Response', statusCode);
-					return cb(err);
+					console.log('Error fetching token', err, 'Response code', statusCode);
+					return cb('Unable to authentcate');
 				}
 			});
 		} else {

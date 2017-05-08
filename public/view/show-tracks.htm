@@ -1,0 +1,29 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <select class="form-control" id="tracksView" ng-model="viewId" ng-change="updateView();">
+      <option value="0">Recently Played Tracks</option>
+      <option value="1">Current Playlist</option>
+      <option value="2">Merged</option>
+    </select>
+  </div>
+  <div class="panel-body">
+    <input class="btn btn-default" type="button" value="Overwrite Current Playlist" />
+    <input class="btn btn-default" type="button" value="Create As New Playlist" />
+  </div>
+</div>  
+<table class="table table-striped">
+  <tr>
+      <th>Name</th>
+      <th>Artist</th>
+      <th>{{ timeHeader }}</th>
+  </tr>        
+  <tr ng-repeat="item in tracks">
+      <td>{{ item.track.name }}</td>
+      <td> 
+        <div ng-repeat = "artist in item.track.artists">
+            {{ artist.name }} <br/>
+        </div>
+      </td>
+      <td>{{ item.last_played_at | date:'medium' }}
+  </tr>
+</table>

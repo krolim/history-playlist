@@ -16,60 +16,16 @@
 			  <li role="presentation" ng-class="{ active: isActive('/showTracks')}"><a href="#showTracks">Home</a></li>
 			  <li role="presentation" ng-class="{ active: isActive('/setPlaylist')}"><a href="#setPlaylist">Settings</a></li>
 			</ul>
-      <div ng-view></div>
-       <script type="text/ng-template" id="setPlaylist.htm">
-       		<div class="panel panel-default">
-					  <div class="panel-heading">
-					    <h3 class="panel-title">Set playlist</h3>
-					  </div>
-					  <div class="panel-body">
-					    <form class="form-inline">
-							  <div class="form-group">
-							    <label for="playlistName">Name</label>
-							    <input type="text" class="form-control" id="playlistName" ng-model="playlistName">
-							  </div>
-							  <button type="submit" class="btn btn-default" ng-click="create()">Create</button>
-							</form>
-							<form class="form-inline">
-								<div class="form-group">
-								    <label for="playlistUrl">URL</label>
-								    <input type="url" class="form-control" id="playlistUrl" ng-model="playlistUrl">
-								  </div>
-								  <button type="submit" class="btn btn-default" ng-click="update()">Set</button>
-						  	</div>
-						  </form>
-					  <p><br/>{{ message }}</p>
-       </script>
+    <!-- <alert ng-show='alertType' class='' close='removeAlert()'>{{ alertMsg }}</alert> --> 
+      <div ng-show='alertType' class="alert alert-{{ alertType }}">
+        {{ alertMsg }}
+      </div>
+       
+       <div ng-view></div>
 
-       <script type="text/ng-template" id="showTracks.htm">
-        <div class="panel panel-default">
-          <div class="panel-heading"><h2>Recently played tracks</h2></div>
-          <div class="panel-body">
-            <input class="btn btn-default" type="button" value="Merge" />
-            <input class="btn btn-default" type="button" value="Overwrite" />
-            <input class="btn btn-default" type="button" value="Create As New" />  
-          </div>
-        </div>  
-          <table class="table table-striped">
-          <tr>
-             <th>Name</th>.
-             <th>Artist</th>
-             <th>Last Played</th>
-          </tr>
-          
-          <tr ng-repeat="item in tracks">
-             <td>{{ item.track.name }}</td>
-             <td> 
-                <div ng-repeat = "artist in item.track.artists">
-                   {{ artist.name }} <br/>
-                </div>
-             </td>
-             <td>{{ item.last_played_at | date:'medium' }}
-          </tr>
-       	</table>
-       </script>
-      
-
+       <script type="text/ng-template" id="setPlaylist.htm" src="view/set-playlist.htm"></script>
+       <script type="text/ng-template" id="showTracks.htm" src="view/show-tracks.htm"></script>
+  
        <script src="js/angular.js"></script>
       
    </body>

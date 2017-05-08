@@ -32,6 +32,22 @@ module.exports.getRecentPlaylist = (req, res) => {
 	});
 };
 
+module.exports.getCurrentPlaylist = (req, res) => {
+	routeIt(req, (err, context) => {
+		if (err) {
+			return reportError(res, err);
+		} 
+		playlist.getUserCurrentPlaylist(context, (err, items) => {
+			if (err) {
+				console.log('Error extracting user playlist', err)
+				return res.status(500).send(err);
+			}
+			return res.send(items);
+		});
+	});
+};
+
+
 module.exports.setPlaylist = (req, res) => {
 	const url = req.body.url;
 	if (!url)

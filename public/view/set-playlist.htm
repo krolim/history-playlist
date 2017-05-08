@@ -1,0 +1,21 @@
+<div class="panel panel-default">
+<div class="panel-heading">
+  <h3 class="panel-title">Set playlist</h3>
+</div>
+<div class="panel-body">
+  <form class="form-inline">
+	  <div class="form-group">
+	    <label for="playlistName">Name</label>
+	    <input type="text" class="form-control" id="playlistName" ng-model="playlistName">
+	  </div>
+	  <button type="submit" class="btn btn-default" ng-click="create()">Create</button>
+	</form>
+	<form class="form-inline">
+		<div class="form-group">
+		    <label for="playlistUrl">URL</label>
+		    <input type="url" class="form-control" id="playlistUrl" ng-model="playlistUrl">
+		  </div>
+		  <button type="submit" class="btn btn-default" ng-click="update()">Set</button>
+  	</div>
+  </form>
+<p><br/>{{ message }}</p>

@@ -11,9 +11,14 @@ const HISTORY_TOKEN = 'spotifyHistoryToken';
 const REFRESH_TOKEN = 'spotifyRefreshToken';
 const USER_ID = 'spotifyHistoryUserId';
 
-const clientId = process.env.CLIENT_ID || ''; // Your client id
-const clientSecret = process.env.CLIENT_SECRET || ''; // Your secret
+const clientId = process.env.CLIENT_ID; 
+const clientSecret = process.env.CLIENT_SECRET;
 const redirectUri = process.env.REDIRECT_URL || 'http://localhost:8888/callback/'; // Your redirect uri
+
+if (!clientId || !clientSecret) {
+  console.log('CLIENT_ID/CLIENT_SECRET not set');
+  process.exit(1);
+}
 
 const authHeaders = { 'Authorization': 'Basic ' + 
     		(new Buffer(clientId + ':' + clientSecret).toString('base64')) };
@@ -169,6 +174,8 @@ const refreshToken = (context, cb) => {
       context.modified = true;
       cb(null, response.statusCode);
     } else {
+      console.log('Error during auth request: %j; Status code: %d, Body: %j', 
+        error, response.statusCode, body);
     	cb(error, response.statusCode);
     }
   });

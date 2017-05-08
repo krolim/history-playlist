@@ -1,10 +1,9 @@
-'use strict'
+'use strict';
 
-const request = require('request'); // "Request" library
 const querystring = require('querystring');
 const oauth = require('./oauth/auth.js');
 const spotify = require('./spot.js');
-const settings = require('./settings.js')
+const settings = require('./settings.js');
 
 const createPlaylist = (context, name, cb) => {
 	if (!name)
@@ -56,13 +55,21 @@ const retrievePlaylistId = (url) => {
 }
 
 
-const processTracks = (items, trackIds, playlist) => {
+const processRecentTracks = (items, trackIds, playlist) => {
 	for (let i=0; i < items.length; i++) {
 		const track = items[i].track;
 		if (!trackIds[track.id]) {
 			playlist.tracks.push({ track: track, last_played_at: items[i].played_at });
 			trackIds[track.id] = 1;
 		}	
+	}
+}
+
+const processPlaylistTracks = (response, playlist) => {
+	const items = response.tracks.items;
+	for (let i=0; i < items.length; i++) {
+		const track = items[i].track;
+		playlist.tracks.push({ track: track, last_played_at: items[i].added_at });	
 	}
 }
 
@@ -77,7 +84,22 @@ const getHistory = (context, cb) => {
 			return cb(err);
 		}
 		// console.log('tracks', items);
-		processTracks(items, trackIds, playlist);
+		processRecentTracks(items, trackIds, playlist);
+		return cb(null, playlist.tracks);
+	});
+}
+
+const getUserCurrentPlaylist = (context, cb) => {
+	const playlist = {
+		tracks: []
+	};
+	const userSettings = settings.get(context.userId);
+	if (!userSettings.playlist)
+		return cb(null, playlist);
+	spotify.getPlaylist(context, userSettings.playlist.id, null, (err, val) => {
+		if (err)
+			return cb(err);
+		processPlaylistTracks(val, playlist);
 		return cb(null, playlist.tracks);
 	});
 }
@@ -87,3 +109,4 @@ module.exports.createPlaylist = createPlaylist;
 // module.exports.modifyPlaylist = modifyPlaylist;
 module.exports.getHistory = getHistory;
 module.exports.setPlaylist = setPlaylist;
+module.exports.getUserCurrentPlaylist = getUserCurrentPlaylist;
