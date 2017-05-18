@@ -16,5 +16,8 @@
     "express": "^4.15.2",
     "querystring": "^0.2.0",
     "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0"
   }
 }

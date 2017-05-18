@@ -12,9 +12,9 @@ const routeIt = (req, cb) => {
 		cb(null, context);
 };
 
-const reportError = (resp, err) => {
+const reportError = (resp, err, statusCode = 500) => {
 	console.log('Error: %j', err);
-	resp.status(err.status).send(err.msg);
+	resp.status(statusCode).send(err);
 }
 
 module.exports.getRecentPlaylist = (req, res) => {
@@ -64,4 +64,74 @@ module.exports.setPlaylist = (req, res) => {
 			return res.send(items);
 		});
 	});	
+};
+
+module.exports.createPlaylist = (req, res) => {
+	const name = req.body.name;
+	// if (!url)
+	// 	return reportError(res, 'Bad request! Url not found');
+	routeIt(req, (err, context) => {
+		if (err) {
+			return reportError(res, err);
+		} 
+		playlist.createPlaylist(context, name, (err, playlist) => {
+			if (err) {
+				console.log('Error creating playlist', err)
+				return res.status(500).send(err);
+			}
+			return res.send(playlist);
+		});
+	});	
+};
+
+module.exports.createAsNewPlaylist = (req, res) => {
+	const name = req.body.name;
+	const trackUris = req.body.trackUris;
+	if (!name || !trackUris) 
+		return reportError(res, 'Bad request! Name or trackUris missing');
+	routeIt(req, (err, context) => {
+		if (err) {
+			return reportError(res, err);
+		} 
+		playlist.createAsNewPlaylist(context, name, trackUris, (err, playlist) => {
+			if (err) {
+				console.log('Error creating playlist', err)
+				return res.status(500).send(err);
+			}
+			return res.send(playlist);
+		});
+	});	
+};
+
+module.exports.addTracks = (req, res) => {
+	const trackUris = req.body.trackUris;
+	if (!trackUris) 
+		return reportError(res, 'Bad request! Name or trackUris missing');
+	routeIt(req, (err, context) => {
+		if (err) {
+			return reportError(res, err);
+		} 
+		playlist.addTracksToUserPlaylist(context, trackUris, (err, playlist) => {
+			if (err) {
+				console.log('Error adding tracks to user playlist', err)
+				return res.status(500).send(err);
+			}
+			return res.send(playlist);
+		});
+	});	
+};
+
+module.exports.merge = (req, res) => {
+	routeIt(req, (err, context) => {
+		if (err) {
+			return reportError(res, err);
+		} 
+		playlist.mergePlaylists(context, (err, items) => {
+			if (err) {
+				console.log('Error extracting merged playlist', err)
+				return res.status(500).send(err);
+			}
+			return res.send(items);
+		});
+	});
 };

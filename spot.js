@@ -76,9 +76,29 @@ const modifyPlaylist = (context, playlistId, tracksUris, cb) => {
 		(err, responseCode, body) => {
 			if (err)
 				return cb(err);
-			if (responseCode !== 200) {
+			if (responseCode !== 201) {
 				console.log('Error modifying playlist [code: %d] msg: %j', responseCode, body);
-				return cb('error ' + responseCode);
+				return cb('Error modifying playlist: ' + responseCode);
+			}
+			return cb(null, body.id, body.name);
+		}
+	);
+}
+
+const addTracksToPlaylist = (context, playlistId, tracksUris, cb) => {
+	const userId = context.userId;
+	if (!userId) {
+		return cb('User not authenticated');
+	}
+	spotRequest(context, 
+		`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
+		'POST', { uris: tracksUris, "position": 0 }, 
+		(err, responseCode, body) => {
+			if (err)
+				return cb(err);
+			if (responseCode !== 201) {
+				console.log('Error modifying (add tracks) playlist [code: %d] msg: %j', responseCode, body);
+				return cb('Error adding tracks: ' + responseCode);
 			}
 			return cb(null, body.id, body.name);
 		}
@@ -110,7 +130,7 @@ const spotRequest = (context, url, method, body, cb) => {
 					request(options, (error, response, body) => {
 						if (error)
 							return cb(error);
-						if (response.statusCode !== 200)
+						if (response.statusCode >= 300)
 							return cb('Not authenticated', response.statusCode, body);
 						return cb(null, response.statusCode, body);
 					});
@@ -129,3 +149,4 @@ module.exports.getRecentlyPlayedTracks = getRecentlyPlayedTracks;
 module.exports.createPlaylist = createPlaylist;
 module.exports.modifyPlaylist = modifyPlaylist;
 module.exports.getPlaylist = getPlaylist;
+module.exports.addTracksToPlaylist = addTracksToPlaylist;
