@@ -2,6 +2,7 @@
 
 const auth = require('./oauth/auth.js');
 const playlist = require('./playlist.js');
+const settings = require('./settings.js');
 
 const routeIt = (req, cb) => {
 	const context = auth.getContext(req);
@@ -42,8 +43,17 @@ module.exports.getCurrentPlaylist = (req, res) => {
 				console.log('Error extracting user playlist', err)
 				return res.status(500).send(err);
 			}
-			return res.send(items);
+			return res.status(200).send(items);
 		});
+	});
+};
+
+module.exports.getSettings = (req, res) => {
+	routeIt(req, (err, context) => {
+		if (err) {
+			return reportError(res, err);
+		} 
+		return res.status(200).send(settings.get(context.userId));
 	});
 };
 

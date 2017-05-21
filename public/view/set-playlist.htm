@@ -1,21 +1,47 @@
 <div class="panel panel-default">
+	<!--
 <div class="panel-heading">
   <h3 class="panel-title">Set playlist</h3>
 </div>
-<div class="panel-body">
-  <form class="form-inline">
-	  <div class="form-group">
-	    <label for="playlistName">Name</label>
-	    <input type="text" class="form-control" id="playlistName" ng-model="playlistName">
-	  </div>
-	  <button type="submit" class="btn btn-default" ng-click="create()">Create</button>
+-->
+	<div class="panel-body">
+		<p>
+			<label class="col-sm-0">Curent playlist:&nbsp</label>
+			<span ng-show="showSetPlaylistForm">
+				<input type="url" placeholder="Playlist URL" style="width: 40%" ng-model="playlistUrl">
+				<button class="btn btn-default" ng-click="update();">
+					<span class="glyphicon glyphicon-ok" 
+								aria-hidden="true" style="color: green"></span>
+				</button>
+				<button class="btn btn-default" ng-click="showSetPlaylistForm=false; showPlaylist=true">
+					<span class="glyphicon glyphicon-remove"  
+								aria-hidden="true" ></span>
+				</button>
+			</span> 
+			<span ng-show="showCreatePlaylistForm">
+				<input type="text" placeholder="Playlist Name" style="width: 40%" ng-model="playlistName">
+				<button class="btn btn-default" ng-click="create();">
+					<span class="glyphicon glyphicon-ok" 
+								aria-hidden="true" style="color: green"></span>
+				</button>
+				<button class="btn btn-default">
+					<span class="glyphicon glyphicon-remove" 
+								ng-click="showCreatePlaylistForm=false; showPlaylist=true" 
+								aria-hidden="true" ></span>
+				</button>
+			</span> 
+			<span ng-show="showPlaylist">
+				<strong><a target="_blanc" href="{{ playlist.url }}">{{ playlist.name }}</a></strong>
+				&nbsp; &nbsp;
+				<a href="" ng-click="showPlaylist=false; showSetPlaylistForm=true" title="Change playlist">
+					<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+				</a>
+				&nbsp;
+				<a href="" ng-click="showPlaylist=false; showCreatePlaylistForm=true" title="Create new playlist">
+					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+				</a>
+			</span>
+		</p>
+	</div>
 	</form>
-	<form class="form-inline">
-		<div class="form-group">
-		    <label for="playlistUrl">URL</label>
-		    <input type="url" class="form-control" id="playlistUrl" ng-model="playlistUrl">
-		  </div>
-		  <button type="submit" class="btn btn-default" ng-click="update()">Set</button>
-  	</div>
-  </form>
-<p><br/>{{ message }}</p>
+	<p><br/>{{ message }}</p>

@@ -7,17 +7,13 @@
     </select>
   </div>
   <div class="panel-body">
-    <button class="btn btn-default" type="button" 
-            ng-click="addTracks();">Add To Current Playlist</button>
-    <button class="btn btn-default"type="button" 
-            ng-click="overwriteTracks();">Overweite Current Playlist</button>
-    <button class="btn btn-default" type="button" 
-            data-toggle="modal" 
-            data-target="#createDialog">Create As New Playlist</button>
+    <button class="btn btn-default" type="button" ng-click="addTracks();">Add To Current Playlist</button>
+    <button class="btn btn-default" type="button" ng-click="overwriteTracks();">Overwrite Current Playlist</button>
+    <button class="btn btn-default" type="button" data-toggle="modal" data-target="#createDialog">Create As New Playlist</button>
     <!-- Modal -->
     <div class="modal fade" id="createDialog" role="dialog">
       <div class="modal-dialog">
-      
+
         <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
@@ -38,32 +34,34 @@
             <button type="submit" class="btn btn-default" ng-click="createNewPlaylist()" data-dismiss="modal">Create</button>
           </div>
         </div>
-        
+
       </div>
     </div>
   </div>
 
-</div>  
+</div>
 
 <table class="table table-striped" style="table-layout: fixed">
   <tr>
-      <th style="width: 3%">#</th>      
-      <th style="width: 3%">
-        <input type="checkbox" ng-model="allSelected" ng-change="selectAll();">
-      </th>      
-      <th>Name</th>
-      <th>Artist</th>
-      <th style="width: 20%">{{ timeHeader }}</th>
-  </tr>        
+    <th style="width: 3%">#</th>
+    <th style="width: 3%">
+      <input type="checkbox" ng-model="allSelected" ng-change="selectAll();">
+    </th>
+    <th>Name</th>
+    <th>Artist</th>
+    <th style="width: 20%">{{ timeHeader }}</th>
+  </tr>
   <tr ng-repeat="item in tracks">
-      <td>{{ $index+1 }}</td>
-      <td><input type="checkbox" ng-model="item.selected"></td>      
-      <td><a target="_blank" href="{{ item.track.external_urls.spotify }}"> {{ item.track.name }} </a></td>
-      <td> 
-        <span ng-repeat = "artist in item.track.artists">
+    <td>{{ $index+1 }}</td>
+    <td><input type="checkbox" ng-model="item.selected"></td>
+    <td>
+      <a target="_blank" href="{{ item.track.external_urls.spotify }}"> {{ item.track.name }} </a>
+    </td>
+    <td>
+      <span ng-repeat="artist in item.track.artists">
             {{ artist.name }}{{ $last ? '': ', '}} 
         </span>
-      </td>
-      <td>{{ item.last_played_at | date:'medium' }}
+    </td>
+    <td>{{ item.last_played_at | date:'medium' }}
   </tr>
 </table>

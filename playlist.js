@@ -22,7 +22,7 @@ const getPlaylistObj = (context, playlistId, playlistName) => {
 	return {
 		id: playlistId,
 		name: playlistName,
-		url: `https://open.spotify.com/user/${context.userId}/playlist/playlistId` 
+		url: `https://open.spotify.com/user/${context.userId}/playlist/${playlistId}` 
 	} 
 }
 

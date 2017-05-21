@@ -115,16 +115,36 @@ mainApp.controller('TracksController', function($scope,$http) {
 mainApp.controller('SetPlaylistController', function($scope,$http) {
 	$scope.playlistName = "Recently Played Tracks";
   // $scope.message = "";
+  $scope.playlist = {};
+  $http.get('/settings').then(
+    function success(response) {
+      $scope.playlist = response.data.playlist;
+      $scope.showPlaylist = true;
+      // $scope.apply();
+    },
+    function(response) {
+      alert(response.data);
+      $scope.showAlert('Error: ' + response.data, 'danger');
+    }
+  );
   $scope.create = function() {
-    $scope.message = "Playlist " + $scope.playlistName + " created";
+    $http.put('/create', { name: $scope.playlistName }).then(
+      function success(response) {
+        $scope.playlist = response.data;
+        $scope.showCreatePlaylistForm = false;
+        $scope.showPlaylist = true;
+      },
+      function error(response) {
+        $scope.showAlert('Error: ' + response, 'error');
+      }
+    );
   }
   $scope.update = function() {
     $http.post('/set-playlist', { url: $scope.playlistUrl }).then(
       function success(response) {
-        $scope.playlistUrl = response.data.url;
-        $scope.playlistName = response.data.name;
-
-        $scope.showAlert('Succesfully fetched tracks', 'success');
+        $scope.playlist = response.data;
+        $scope.showSetPlaylistForm = false;
+        $scope.showPlaylist = true;
       },
       function error(response) {
         $scope.showAlert('Error: ' + response, 'error');

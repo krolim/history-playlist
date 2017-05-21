@@ -33,6 +33,7 @@ app.get("/current", routes.getCurrentPlaylist);
 app.get("/merged", routes.merge);
 app.post("/set-playlist", routes.setPlaylist);
 app.post("/add", routes.addTracks);
+app.get("/settings", routes.getSettings);
 
 // app.get('/refresh', playlists.recentlyPlayed);
 // app.post('/modify', playlists.modifyPlaylist);
